@@ -1,2 +1,2 @@
-# making-the-service-more-robust-and-production-ready-lp-author
-Repository for liveProject: Making the service more robust and production ready
+# stability-and-logging-lp-author
+Repository for liveProject: Stability and Logging
