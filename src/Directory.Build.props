@@ -1,0 +1,57 @@
+<Project>
+
+  <!-- https://docs.microsoft.com/en-us/visualstudio/msbuild/customize-your-build -->
+
+  <PropertyGroup>
+    <!-- version numbers -->
+    <AssemblyVersion>0.0.0</AssemblyVersion>
+    <Version>0.0.1</Version>
+    <FileVersion>0.0.1</FileVersion>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+
+    <!-- Target frameworks -->
+    <TargetFramework>net6.0</TargetFramework>
+
+    <!-- Configurations -->
+    <Configurations>Debug;Release</Configurations>
+    <Platforms>AnyCPU</Platforms>
+
+    <!-- compiler configuration -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>1591;1592;1573;1571;1570;1572;1701;1702;1705;</NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningsAsErrors />
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;TRACE;JETBRAINS_ANNOTATIONS</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE;JETBRAINS_ANNOTATIONS</DefineConstants>
+  </PropertyGroup>
+
+  <!-- common dependencies -->
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.406">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

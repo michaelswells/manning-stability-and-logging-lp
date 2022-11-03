@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <RootNamespace>RobotsInc.Inspections.Server</RootNamespace>
+        <CodeAnalysisRuleSet>..\Analyzer-Main.ruleset</CodeAnalysisRuleSet>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\RobotsInc.Inspections.API.I\RobotsInc.Inspections.API.I.csproj" />
+      <ProjectReference Include="..\RobotsInc.Inspections.BusinessLogic\RobotsInc.Inspections.BusinessLogic.csproj" />
+      <ProjectReference Include="..\RobotsInc.Inspections.Models\RobotsInc.Inspections.Models.csproj" />
+      <ProjectReference Include="..\RobotsInc.Inspections.Repositories\RobotsInc.Inspections.Repositories.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.3.0" />
+
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
+    </ItemGroup>
+
+</Project>

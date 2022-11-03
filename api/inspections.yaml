@@ -1,0 +1,1631 @@
+openapi: 3.0.1
+info:
+  title: RobotsInc Inspections API
+  description: |-
+    This is the RobotsInc Inspections API specification.  This api will be used
+    by both the Inspections web application and by the Android app.
+    
+    # Authentication and authorization
+    
+    ## Authentication using Google accounts
+    
+    The API uses Google as an identity provider.  The user will be logged in
+    with his/her Google account and a JWT token provided by Google will be used
+    to authenticate requests against the API.
+    
+    # Authorization
+    
+    Most of the API endpoints can only be called by authenticated users.  An
+    authenticated user must also be authorized to call a specific endpoint.
+    The authorization that is required for a specific endpoint is documented on
+    the endpoint itself.
+    
+    A distinction is made between 2 types of users: internal _employee_ users
+    and external _customer_ users.  In general, internal users can access all
+    endpoints and external users can only access read-only endpoints and are
+    limited to the data of the customer(s) that they are linked to.
+    
+    Aside from the internal and external users, one specific user can be designated
+    as the _admin_ user.  This is the only user who is able to maintain
+    authorizations within the system.
+
+  version: 0.4.0
+  contact:
+    name: Anna Lyst
+    email: anna.lyst@boutique.eu
+servers:
+  - url: 'http://localhost:5000'
+    description: |-
+      Currently in development, no final url available yet.
+tags:
+  - name: Health
+    description: Health status of the system
+  - name: Authorization
+    description: User access to the system
+  - name: Inspections
+    description: Business functionality of the system
+paths:
+  /api/v1/health:
+    get:
+      summary: Health check.
+      tags:
+        - Health
+      description: |-
+        A simple health check to verify that the backend is running as expected.
+        The http status code of the response is used to indicate whether the
+        service can handle incoming requests at this moment.
+        
+        The result body contains both the status and an informative message.
+        
+        Accessible by everyone: authentication not required.
+      responses:
+        200:
+          description: |-
+            The service is considered healthy and can handle incoming requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResult'
+        503:
+          description: |-
+            The service is not healthy and can currently not handle incoming
+            requests.  The reason for this is on the server side and the client
+            should retry at a later time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResult'
+  /api/v1/users:
+    post:
+      summary: Create a user.
+      tags:
+        - Authorization
+      description: |-
+        Create a new user.
+        
+        Accessible only by the _admin_ user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        201:
+          headers:
+            Location:
+              description: The location of the newly created resource.
+              schema:
+                type: string
+                format: uri
+          description: |-
+            The user is created.  The location where the user can be requested is given in the `Location`
+            header.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        400:
+          description: |-
+            The user could not be created, because of bad input.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/users/{userId}:
+    get:
+      summary: Retrieve a user.
+      tags:
+        - Authorization
+      description: |-
+        Retrieve the user with the given `userId`.
+        
+        Accessible only by the _admin_ user.
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        200:
+          description: Found the user with the given `userId`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        404:
+          description: The user with the given `userId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    put:
+      summary: Update a user.
+      tags:
+        - Authorization
+      description: |-
+        Update the user with the given `userId` using the given properties.
+        
+        Accessible only by the _admin_ user.
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        200:
+          description: Updated the user with the given `userId`, using the given properties.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        400:
+          description: |-
+            The user could not be updated, because of bad input.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        404:
+          description: The user with the given `userId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    delete:
+      summary: Delete a user.
+      tags:
+        - Authorization
+      description: |-
+        Remove the user with the given `userId`.
+        
+        Accessible only by the _admin_ user.
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        204:
+          description: The user is deleted.
+        404:
+          description: The user with the given `userId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/users/{userId}/claims:
+    post:
+      summary: Create a claim.
+      tags:
+        - Authorization
+      description: |-
+        Create a new claim.
+        
+        Accessible only by the _admin_ user.
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Claim'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        201:
+          headers:
+            Location:
+              description: The location of the newly created resource.
+              schema:
+                type: string
+                format: uri
+          description: |-
+            The claim is created.  The location where the claim can be requested is given in the `Location`
+            header.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Claim'
+        400:
+          description: |-
+            The claim could not be created, because of bad input.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        404:
+          description: |-
+            The claim could not be created: the user with the given `userId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/users/{userId}/claims/{claimId}:
+    get:
+      summary: Retrieve a claim.
+      tags:
+        - Authorization
+      description: |-
+        Retrieve the claim with the given `claimId`, belonging to the user with the given `userId`.
+        
+        Accessible only by the _admin_ user.
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: '#/components/parameters/ClaimId'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        200:
+          description: Found the claim with the given `claimId`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Claim'
+        404:
+          description: |-
+            The claim with the given `claimId` and belonging to the user with the given `userId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    put:
+      summary: Update a claim.
+      tags:
+        - Authorization
+      description: |-
+        Update the claim with the given `claimId`, belonging to the user with the given `userId`, using the given properties.
+        
+        Accessible only by the _admin_ user.
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: '#/components/parameters/ClaimId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Claim'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        200:
+          description: Updated the claim with the given `claimId`, belonging to the user with the given `userId` using the given properties.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Claim'
+        400:
+          description: |-
+            The claim could not be updated, because of bad input.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        404:
+          description: The claim with the given `claimId`, belonging to the user with the given `userId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    delete:
+      summary: Delete a claim.
+      tags:
+        - Authorization
+      description: |-
+        Remove the claim with the given `userId`.
+        
+        Accessible only by the _admin_ user.
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: '#/components/parameters/ClaimId'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        204:
+          description: The claim is deleted.
+        404:
+          description: |-
+            The claim with the given `claimId` and belonging to the user with the given `userId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/customers:
+    post:
+      summary: Create a customer.
+      tags:
+        - Inspections
+      description: |-
+        Create a new customer with the given properties.
+        
+        Accessible only by _employee_ users.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        201:
+          headers:
+            Location:
+              description: The location of the newly created resource.
+              schema:
+                type: string
+                format: uri
+          description: |-
+            The customer is created.  The location where the customer can be requested is given in the `Location`
+            header.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        400:
+          description: |-
+            The customer could not be created, because of bad input.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/customers/{customerId}:
+    get:
+      summary: Retrieve a customer.
+      tags:
+        - Inspections
+      description: |-
+        Retrieve the customer with the given `customerId`.
+        
+        Accessible by both _employee_ and _customer_ users.  _Customer_ users can only access data from the _Customer_
+        they are linked to.
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        200:
+          description: Found the customer with the given `customerId`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        404:
+          description: The customer with the given `customerId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    put:
+      summary: Update a customer.
+      tags:
+        - Inspections
+      description: |-
+        Update the customer with the given `customerId` using the given properties.
+        
+        Accessible only by _employee_ users.
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        200:
+          description: Updated the customer with the given `customerId`, using the given properties.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        400:
+          description: |-
+            The customer could not be updated, because of bad input.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        404:
+          description: The customer with the given `customerId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    delete:
+      summary: Delete a customer.
+      tags:
+        - Inspections
+      description: |-
+        Remove the customer with the given `customerId`.
+        
+        Accessible only by _employee_ users.
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        204:
+          description: The customer is deleted.
+        404:
+          description: The customer with the given `customerId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/customers/{customerId}/robots:
+    post:
+      summary: Create a robot.
+      tags:
+        - Inspections
+      description: |-
+        Create a new robot with the given properties.
+        
+        Note that 2 types of robots are supported, each with their own characteristics: articulated robots and automated
+        guided vehicles.
+        
+        Accessible only by _employee_ users.
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Robot'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        201:
+          headers:
+            Location:
+              description: The location of the newly created resource.
+              schema:
+                type: string
+                format: uri
+          description: |-
+            The robot is created.  The location where the robot can be retrieved, is given in the `Location` header.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Robot'
+        400:
+          description: |-
+            The robot could not be created, because of bad input.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        404:
+          description: |-
+            The robot could not be created: the customer with the given `customerId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    get:
+      summary: Retrieve robots from customer.
+      tags:
+        - Inspections
+      description: |-
+        Retrieve all robots that belong to the customer identified by `customerId`.
+
+        Note that 2 different types of robots can be present in the resulting list.
+
+        Accessible by both _employee_ and _customer_ users.  _Customer_ users can only access data from the _Customer_
+        they are linked to.
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        200:
+          description: |-
+            The robots are successfully retrieved.
+
+            The robots are sorted according to their manufacturing date with the most recently manufactured robots
+            first.
+            
+            Note that it is possible that the retrieved list is empty, when the customer exists but does not have any
+            registered robots.
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Robot'
+        404:
+          description: |-
+            The robots could not be retrieved because the customer with the given `customerId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/customers/{customerId}/robots/{robotId}:
+    get:
+      summary: Retrieve a robot.
+      tags:
+        - Inspections
+      description: |-
+        Retrieve the robot with the given `robotId`, belonging to the customer with the given `customerId`.
+        
+        Accessible by both _employee_ and _customer_ users.  _Customer_ users can only access data from the _Customer_
+        they are linked to.
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/RobotId'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        200:
+          description: Found the robot with the given `robotId`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Robot'
+        404:
+          description: |-
+            The robot with the given `robotId` and belonging to the customer with the given `customerId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    put:
+      summary: Update a robot.
+      tags:
+        - Inspections
+      description: |-
+        Update the robot with the given `robotId`, belonging to the customer with the given `customerId`, using the
+        given properties.
+        
+        Note that the type of a robot cannot be changed.  If the robot was created with the wrong type, that robot must
+        be removed and a new robot must be created.
+        
+        Accessible only by _employee_ users.
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/RobotId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Robot'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        200:
+          description: |-
+            Updated the robot with the given `robotId`, belonging to the customer with the given `customerId`, using the
+            given properties.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Robot'
+        400:
+          description: |-
+            The robot could not be updated due to bad input.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        404:
+          description: |-
+            The robot with the given `robotId` and belonging to the customer with the given `customerId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    delete:
+      summary: Delete a robot.
+      tags:
+        - Inspections
+      description: |-
+        Remove the robot with the given `robotId`, belonging to the customer with the given `customerId`.
+        
+        Accessible only by _employee_ users.
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/RobotId'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        204:
+          description: The robot is deleted.
+        404:
+          description: |-
+            The robot with the given `robotId` and belonging to the customer with the given `customerId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/customers/{customerId}/robots/{robotId}/inspections:
+    post:
+      summary: Create an inspection.
+      tags:
+        - Inspections
+      description: |-
+        Create a new inspection for a given robot.  The robot is identified by its own id `robotId` and by the customer
+        the robot belongs to, identified by `customerId`.
+        
+        Accessible only by _employee_ users.
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/RobotId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Inspection'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        201:
+          headers:
+            Location:
+              description: The location of the newly created resource.
+              schema:
+                type: string
+                format: uri
+          description: |-
+            The inspection is created.  The location where the inspection can be retrieved, is given in the `Location`
+            header.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inspection'
+        400:
+          description: |-
+            The inspection could not be created, because of bad input.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        404:
+          description: |-
+            The inspection could not be created: the robot with the given `robotId` and belonging to the customer with
+            the given `customerId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    get:
+      summary: Retrieve inspections from customer.
+      tags:
+        - Inspections
+      description: |-
+        Retrieve the inspections for the given robot identified by `robotId`, that belongs to the customer identified
+        by `customerId`.
+        
+        Accessible by both _employee_ and _customer_ users.  _Customer_ users can only access data from the _Customer_
+        they are linked to.
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/RobotId'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        200:
+          description: |-
+            The inspections were retrieved successfully.
+
+            The inspections are sorted according to their date with the most recently planned inspections first.
+
+            Note that the resulting list of inspections will be empty, when no inspections have been done yet for the
+            robot.
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Inspection'
+        404:
+          description: |-
+            The inspections could not be retrieved because the robot identified by `robotId` and belonging to the
+            customer identified by `customerId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/customers/{customerId}/robots/{robotId}/inspections/{inspectionId}:
+    get:
+      summary: Retrieve an inspection.
+      tags:
+        - Inspections
+      description: |-
+        Retrieve the inspection with the given `inspectionId` of the robot with the given `robotId`, belonging to the
+        customer with the given `customerId`.
+        
+        Accessible by both _employee_ and _customer_ users.  _Customer_ users can only access data from the _Customer_
+        they are linked to.
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/RobotId'
+        - $ref: '#/components/parameters/InspectionId'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        200:
+          description: Found the inspection with the given `inspectionId`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inspection'
+        404:
+          description: |-
+            The inspection with the given `inspectionId` of the robot with the given `robotId`, belonging to the
+            customer with the given `customerId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    put:
+      summary: Update an inspection.
+      tags:
+        - Inspections
+      description: |-
+        Update the inspection with the given `inspectionId` of the robot with the given `robotId`, belonging to the
+        customer with the given `customerId`, using the given properties.
+        
+        Accessible only by _employee_ users.
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/RobotId'
+        - $ref: '#/components/parameters/InspectionId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Inspection'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        200:
+          description: |-
+            Updated the inspection with the given `inspectionId` of the robot with the given `robotId`, belonging to the
+            customer with the given `customerId`, using the given properties.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inspection'
+        400:
+          description: |-
+            The inspection could not be updated due to bad input.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        404:
+          description: |-
+            The inspection with the given `inspectionId` of the robot with the given `robotId`, belonging to the
+            customer with the given `customerId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    delete:
+      summary: Delete an inspection.
+      tags:
+        - Inspections
+      description: |-
+        Remove the inspection with the given `inspectionId` of the robot with the given `robotId`, belonging to the
+        customer with the given `customerId`.
+        
+        Accessible only by _employee_ users.
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/RobotId'
+        - $ref: '#/components/parameters/InspectionId'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        204:
+          description: The inspection is deleted.
+        404:
+          description: |-
+            The inspection with the given `inspectionId` of the robot with the given `robotId`, belonging to the
+            customer with the given `customerId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/customers/{customerId}/robots/{robotId}/inspections/{inspectionId}/notes:
+    post:
+      summary: Create a note.
+      tags:
+        - Inspections
+      description: |-
+        Create a note on an inspection for a given robot.  The inspection is identified by its id `inspectionId` and is
+        linked to the robot with the given `robotId` and owned by the customer with the given `customerId`.
+        
+        Accessible only by _employee_ users.
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/RobotId'
+        - $ref: '#/components/parameters/InspectionId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Note'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        201:
+          headers:
+            Location:
+              description: The location of the newly created resource.
+              schema:
+                type: string
+                format: uri
+          description: |-
+            The note is created.  The location where the note can be retrieved, is given in the `Location` header.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+        400:
+          description: |-
+            The note could not be created, because of bad input.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        404:
+          description: |-
+            The note could not be created: the inspection identified by the combination of `inspectionId`, `robotId` and
+            `customerId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    get:
+      summary: Retrieves notes from inspection.
+      tags:
+        - Inspections
+      description: |-
+        Retrieves the notes from an inspection for a given robot.  The inspection is identified by its id `inspectionId`
+        and is linked to the robot with the given `robotId` and owned by the customer with the given `customerId`.
+        
+        Accessible by both _employee_ and _customer_ users.  _Customer_ users can only access data from the _Customer_
+        they are linked to.
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/RobotId'
+        - $ref: '#/components/parameters/InspectionId'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        200:
+          description: |-
+            The notes are successfully retrieved.
+            
+            The notes are sorted according to their importance level with the most important notes first.
+
+            Note that the list of notes will be empty when no notes have been added yet to the inspection.
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Note'
+        404:
+          description: |-
+            The notes could not be retrieved: the inspection identified by the combination of `inspectionId`, `robotId`
+            and `customerId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/customers/{customerId}/robots/{robotId}/inspections/{inspectionId}/notes/{noteId}:
+    get:
+      summary: Retrieve a note.
+      tags:
+        - Inspections
+      description: |-
+        Retrieve the note with the given `noteId`, that is part of the inspection identified by the given
+        `inspectionId`, `robotId` and `customerId`.
+        
+        Accessible by both _employee_ and _customer_ users.  _Customer_ users can only access data from the _Customer_
+        they are linked to.
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/RobotId'
+        - $ref: '#/components/parameters/InspectionId'
+        - $ref: '#/components/parameters/NoteId'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        200:
+          description: Found the note with the given `noteId`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+        404:
+          description: |-
+            The note with the given `noteId`, that belongs to the inspection identified by the given `inspectionId`,
+            `robotId` and `customerId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    put:
+      summary: Update a note.
+      tags:
+        - Inspections
+      description: |-
+        Update the note with the given `noteId`, that is part of the inspection identified by the given
+        `inspectionId`, `robotId` and `customerId`.
+        
+        Accessible only by _employee_ users.
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/RobotId'
+        - $ref: '#/components/parameters/InspectionId'
+        - $ref: '#/components/parameters/NoteId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Note'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        200:
+          description: |-
+            Updated the note with the given `noteId`, that is part of the inspection identified by the given
+            `inspectionId`, `robotId` and `customerId`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inspection'
+        400:
+          description: |-
+            The note could not be updated due to bad input.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        404:
+          description: |-
+            The note with the given `noteId`, that belongs to the inspection identified by the given `inspectionId`,
+            `robotId` and `customerId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    delete:
+      summary: Delete a note.
+      tags:
+        - Inspections
+      description: |-
+        Remove the note with the given `noteId`, that is part of the inspection identified by the given
+        `inspectionId`, `robotId` and `customerId`.
+        
+        Accessible only by _employee_ users.
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/RobotId'
+        - $ref: '#/components/parameters/InspectionId'
+        - $ref: '#/components/parameters/NoteId'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        204:
+          description: The note is deleted.
+        404:
+          description: |-
+            The note with the given `noteId`, that belongs to the inspection identified by the given `inspectionId`,
+            `robotId` and `customerId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/customers/{customerId}/robots/{robotId}/inspections/{inspectionId}/notes/{noteId}/photos:
+    post:
+      summary: Add a photo to a note.
+      tags:
+        - Inspections
+      description: |-
+        Add a photo to a given note.  The note is identified by its id `noteId` and is linked to the inspection
+        identified by `inspectionId`, `robotId` and `customerId`.
+        
+        Accessible only by _employee_ users.
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/RobotId'
+        - $ref: '#/components/parameters/InspectionId'
+        - $ref: '#/components/parameters/NoteId'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                fileName:
+                  type: string
+                  format: binary
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        201:
+          headers:
+            Location:
+              description: The location of the newly created resource.
+              schema:
+                type: string
+                format: uri
+          description: |-
+            The photo is added.  The location where the photo can be retrieved, is given in the `Location` header.
+        400:
+          description: |-
+            The photo could not be created, because of bad input.
+            
+            Only files with a file name extension of '.jpg' are accepted.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    get:
+      summary: Retrieves photos from note.
+      tags:
+        - Inspections
+      description: |-
+        Retrieves the photos added to a given note.  The note is identified by the given `noteId`, that is part of the
+        inspection identified by the given `inspectionId`, `robotId` and `customerId`.
+        
+        Accessible by both _employee_ and _customer_ users.  _Customer_ users can only access data from the _Customer_
+        they are linked to.
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/RobotId'
+        - $ref: '#/components/parameters/InspectionId'
+        - $ref: '#/components/parameters/NoteId'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        200:
+          description: |-
+            Found the note with the given `noteId` and the result is a list of references to the photos that are added
+            on the note.  Note that the list is empty when no photos were added to the note.
+          content:
+            application/json:
+              schema:
+                items:
+                  description: |-
+                    Reference to a photo: the url where a specific photo can be downloaded.
+                  type: string
+                  format: uri
+        404:
+          description: |-
+            The note with the given `noteId`, that belongs to the inspection identified by the given `inspectionId`,
+            `robotId` and `customerId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/customers/{customerId}/robots/{robotId}/inspections/{inspectionId}/notes/{noteId}/photos/{photoId}:
+    get:
+      summary: Retrieves a photo.
+      tags:
+        - Inspections
+      description: |-
+        Retrieves the photo identified by `photoId` belonging to the given note.  The note is identified by the given
+        `noteId`, that is part of the inspection identified by the given `inspectionId`, `robotId` and `customerId`.
+        
+        Accessible by both _employee_ and _customer_ users.  _Customer_ users can only access data from the _Customer_
+        they are linked to.
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/RobotId'
+        - $ref: '#/components/parameters/InspectionId'
+        - $ref: '#/components/parameters/NoteId'
+        - $ref: '#/components/parameters/PhotoId'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        200:
+          description: |-
+            Found the photo identified by the given `photoId`.
+          content:
+            application/octet-stream:
+              schema:
+                description: The binary content of the image.
+                type: string
+                format: binary
+        404:
+          description: |-
+            The photo identified by `photoId`, that belongs to the note identified by the given `noteId`,
+            `inspectionId`, `robotId` and `customerId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    delete:
+      summary: Delete a photo.
+      tags:
+        - Inspections
+      description: |-
+        Remove the photo with the given `photoId`, linked to the note identified by the given `noteId`, `inspectionId`,
+        `robotId` and `customerId`.
+        
+        Accessible only by _employee_ users.
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/RobotId'
+        - $ref: '#/components/parameters/InspectionId'
+        - $ref: '#/components/parameters/NoteId'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        204:
+          description: The note is deleted.
+        404:
+          description: |-
+            The note with the given `noteId`, that belongs to the inspection identified by the given `inspectionId`,
+            `robotId` and `customerId` does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/search/robots:
+    get:
+      summary: Search robots.
+      tags:
+        - Inspections
+      description: |-
+        Retrieves a paged list of robots that match the given search criteria.  As part of the search criteria, the
+        `page` and the `pageSize` must be specified.  The result contains metadata on the total number of matching
+        robots.
+        
+        Accessible by both _employee_ and _customer_ users.  _Customer_ users can only access data from the _Customer_
+        they are linked to.  The latter means that _Customer_ users can only retrieve robots that are owned by the
+        _Customer_ they are linked to.
+      parameters:
+        - $ref: '#/components/parameters/SearchPageSize'
+        - $ref: '#/components/parameters/SearchPage'
+        - $ref: '#/components/parameters/SearchCustomerId'
+        - $ref: '#/components/parameters/SearchRobotType'
+        - $ref: '#/components/parameters/SearchManufacturingDateFrom'
+        - $ref: '#/components/parameters/SearchManufacturingDateTo'
+      security:
+        - GoogleIdToken:
+            - email
+      responses:
+        200:
+          description: |-
+            The search request is valid and the matching robots are returned.
+            
+            The robots are sorted according to their manufacturing date with the most recently manufactured robots
+            first.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RobotsPagedList'
+        400:
+          description: |-
+            One or more parameters of the search request are missing or not valid.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+
+components:
+  securitySchemes:
+    GoogleIdToken:
+      description: |-
+        OAuth2 authentication with Google as identity provider.  For
+        authentication of a user, the authorization code flow with
+        proof key for code exchange (PKCE) is used.
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: "https://accounts.google.com/o/oauth2/v2/auth"
+          tokenUrl: "https://oauth2.googleapis.com/token"
+          scopes:
+            email: "The email address of the user is used to identify the user."
+      x-tokenName: "id_token"
+  parameters:
+    UserId:
+      name: userId
+      in: path
+      required: true
+      description: Unique id of a user.
+      schema:
+        type: integer
+    ClaimId:
+      name: claimId
+      in: path
+      required: true
+      description: Unique id of a claim.
+      schema:
+        type: integer
+    CustomerId:
+      name: customerId
+      in: path
+      required: true
+      description: Unique id of a customer.
+      schema:
+        type: integer
+    RobotId:
+      name: robotId
+      in: path
+      required: true
+      description: Unique id of a robot.
+      schema:
+        type: integer
+    InspectionId:
+      name: inspectionId
+      in: path
+      required: true
+      description: Unique id of an inspection.
+      schema:
+        type: integer
+    NoteId:
+      name: noteId
+      in: path
+      required: true
+      description: Unique id of a note.
+      schema:
+        type: integer
+    PhotoId:
+      name: photoId
+      in: path
+      required: true
+      description: Unique id of a photo.
+      schema:
+        type: integer
+    SearchCustomerId:
+      name: customerId
+      in: query
+      required: false
+      description: Unique id of a customer.
+      schema:
+        type: integer
+    SearchRobotType:
+      name: robotType
+      in: query
+      required: false
+      description: The type of robot.
+      schema:
+        type: string
+        enum:
+          - ARTICULATED_ROBOT
+          - AUTOMATED_GUIDED_VEHICLE
+    SearchPage:
+      name: page
+      in: query
+      required: true
+      description: The page of the search results.
+      schema:
+        type: integer
+        minimum: 1
+    SearchPageSize:
+      name: pageSize
+      in: query
+      required: true
+      description: The number of search results in a page.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 1000
+    SearchManufacturingDateFrom:
+      name: manufacturingDateFrom
+      in: query
+      required: false
+      description: The minimum manufacturing date.
+      schema:
+        type: string
+        format: date
+    SearchManufacturingDateTo:
+      name: manufacturingDateTo
+      in: query
+      required: false
+      description: The maximum manufacturing date.
+      schema:
+        type: string
+        format: date
+
+  schemas:
+    Problem:
+      description: A Problem Details object (RFC 7807)
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+          description: A URI reference that identifies the problem type
+        title:
+          type: string
+          description: A short, human-readable summary of the problem type. This is not specific to this occurrence of the problem.
+          example: Service Unavailable
+        status:
+          type: integer
+          format: int32
+          description: The HTTP status code generated by the origin server for this occurrence of the problem.
+          example: 503
+        detail:
+          type: string
+          description: A human-readable explanation specific to this occurrence of the problem.
+        instance:
+          type: string
+          format: uri
+          description: A URI reference that identifies the specific occurrence of the problem. It may or may not yield further information if dereferenced.
+    HealthResult:
+      description: Object containing the health status of the service.
+      type: object
+      properties:
+        status:
+          description: |-
+            Enum representing the health status.
+            
+            **HEALTHY**: The service is up & running and accepts incoming
+            requests.
+            
+            **UNHEALTHY**: The service is not in a healthy state and cannot
+            accept incoming requests at this time.  A reason for this can be
+            the fact that a dependency is not available (such as the database).
+            
+            **CLOSED**: The service is closed for incoming requests outside of
+            office hours.  Office hours are defined as weekdays, 9am to 5pm.  
+            Note that this status overrules all the other statuses.
+
+          type: string
+          enum:
+            - HEALTHY
+            - UNHEALTHY
+            - CLOSED
+        message:
+          description: Extra info regarding the health status (human readable).
+          type: string
+      required:
+        - status
+    Id:
+      description: A unique id.
+      type: number
+      format: int64
+      minimum: 1
+      readOnly: true
+    User:
+      description: A user of the RobotsInc Inspections application.
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        email:
+          description: |-
+            The email address of the user, which is used to identify the user.
+          type: string
+          format: email
+          maxLength: 100
+      required:
+        - id
+        - email
+    Claim:
+      description: A security claim.
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        type:
+          description: |-
+            The type of the claim.
+          type: string
+          maxLength: 256
+        value:
+          description: |-
+            The value of the claim.
+          type: string
+          maxLength: 256
+      required:
+        - id
+        - type
+        - value
+    Customer:
+      description: A customer of the RobotsInc company.
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        name:
+          description: The name of the customer.
+          type: string
+          maxLength: 30
+        description:
+          description: Extra information on the customer.
+          type: string
+          maxLength: 250
+      required:
+        - id
+        - name
+    Robot:
+      description: A robot of the RobotsInc company.
+      type: object
+      discriminator:
+        propertyName: robotType
+        mapping:
+          ARTICULATED_ROBOT: '#/components/schemas/ArticulatedRobot'
+          AUTOMATED_GUIDED_VEHICLE: '#/components/schemas/AutomatedGuidedVehicle'
+      properties:
+        robotType:
+          description: The type of robot.
+          type: string
+          enum:
+            - ARTICULATED_ROBOT
+            - AUTOMATED_GUIDED_VEHICLE
+        id:
+          $ref: '#/components/schemas/Id'
+        serialNumber:
+          description: The serial number of the robot. This is unique across all robots manufactured by RobotsInc.
+          type: string
+          maxLength: 16
+        manufacturingDate:
+          description: The manufacturing date of the robot.
+          type: string
+          format: date
+        description:
+          description: Extra information on the robot.
+          type: string
+          maxLength: 512
+      required:
+        - id
+        - robotType
+        - serialNumber
+        - manufacturingDate
+    ArticulatedRobot:
+      description: A robot of the type articulated robot (robotic arm).
+      allOf:
+        - $ref: '#/components/schemas/Robot'
+        - type: object
+          properties:
+            nrOfJoints:
+              description: The number of joints in the robotic arm.
+              type: integer
+          required:
+            - nrOfJoints
+    AutomatedGuidedVehicle:
+      description: An automated guided vehicle (AGV).
+      allOf:
+        - $ref: '#/components/schemas/Robot'
+        - type: object
+          properties:
+            navigationType:
+              description: The type of navigation that the robot uses.
+              type: string
+              enum:
+                - WIRED
+                - GUIDE_TAPE
+                - LASER
+            chargingType:
+              description: The mechanism used to charge the robot's battery.
+              type: string
+              enum:
+                - MANUAL_BATTERY_SWAP
+                - AUTOMATIC_BATTERY_SWAP
+                - AUTOMATIC_CHARGING
+          required:
+            - chargingType
+            - navigationType
+    Inspection:
+      description: |-
+        This represents the inspection of a robot.
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        date:
+          description: |-
+            The date when the inspection is planned or executed.  It is possible to register an inspection for a date
+            in the future.
+          type: string
+          format: date
+        state:
+          description: |-
+            Indicates the state of the inspection.
+            
+            **PLANNED**: the inspection is planned to be executed in the future.
+            
+            **IN_PROGRESS**: the inspection is currently ongoing.
+            
+            **EXECUTED**: the inspection is executed, but the report is not completed yet.
+            
+            **REPORTED**: the inspection is executed and the report is finished.
+          type: string
+          enum:
+            - PLANNED
+            - IN_PROGRESS
+            - EXECUTED
+            - REPORTED
+        summary:
+          description: |-
+            Summary contains the conclusions of the inspection of a robot.  Detailed remarks from the inspection can
+            be found in the notes attached to the inspection.
+          type: string
+          maxLength: 512
+      required:
+        - id
+        - date
+        - state
+    Note:
+      description: |-
+        A note that is made during the inspection of a robot.  A note is a remark made by the technician performing the
+        maintenance of a robot.
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        summary:
+          description: Short description of what the note is about.
+          type: string
+          maxLength: 50
+        description:
+          description: The note text itself.
+          type: string
+          maxLength: 512
+        importance:
+          description: Indicates the graveness of the note.
+          type: string
+          enum:
+            - LOW
+            - MEDIUM
+            - HIGH
+      required:
+        - id
+        - summary
+        - importance
+    RobotsPagedList:
+      description: |-
+        A paged list of robots.  This is the result of a search on robots and contains metadata on the page of results
+        and on the total number of results.
+      type: object
+      properties:
+        page:
+          description: The page that is shown. (zero based)
+          type: number
+          minimum: 0
+        pageSize:
+          description: The size of the page. (requested, the number of items can be smaller)
+          type: number
+          minimum: 1
+          maximum: 1000
+        totalCount:
+          description: The total number of robots matching the search request.
+          type: number
+        totalPages:
+          description: The total number of pages matching the search request.
+          type: number
+        items:
+          description: The matching robots contained in the requested page.
+          type: array
+          items:
+            $ref: '#/components/schemas/Robot'

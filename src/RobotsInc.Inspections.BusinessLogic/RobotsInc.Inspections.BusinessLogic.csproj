@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <RootNamespace>RobotsInc.Inspections.BusinessLogic</RootNamespace>
+        <CodeAnalysisRuleSet>..\Analyzer-Main.ruleset</CodeAnalysisRuleSet>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\RobotsInc.Inspections.API.I\RobotsInc.Inspections.API.I.csproj" />
+      <ProjectReference Include="..\RobotsInc.Inspections.Models\RobotsInc.Inspections.Models.csproj" />
+      <ProjectReference Include="..\RobotsInc.Inspections.Repositories\RobotsInc.Inspections.Repositories.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+    </ItemGroup>
+
+</Project>

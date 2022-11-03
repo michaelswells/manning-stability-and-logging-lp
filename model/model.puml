@@ -1,0 +1,116 @@
+@startuml
+
+!theme reddress-lightblue
+
+top to bottom direction
+
+class Customer {
+  +id: long [1]
+  +name: String [1]
+  +description: String [0..1]
+}
+
+enum RobotType {
+  ARTICULATED_ROBOT
+  AUTOMATED_GUIDED_VEHICLE
+}
+
+abstract class Robot {
+  +id: long [1]
+  +serialNumber: String [1]
+  +manufacturingDate: DateTime [1]
+  +description: String [0..1]
+  +/robotType: RobotType [1]
+}
+
+Customer "1" --right-- "0..*" Robot : owns >
+
+Robot .up.> RobotType
+
+class ArticulatedRobot {
+  +nrOfJoints: int [1]
+}
+
+Robot <|-- ArticulatedRobot
+
+enum NavigationType {
+  WIRED
+  GUIDE_TAPE
+  LASER
+}
+
+enum ChargingType {
+  MANUAL_BATTERY_SWAP
+  AUTOMATIC_BATTERY_SWAP
+  AUTOMATIC_CHARGING
+}
+
+class AutomatedGuidedVehicle {
+  +navigationType: NavigationType [1]
+  +chargingType: ChargingType [1]
+}
+
+Robot <|-- AutomatedGuidedVehicle
+
+AutomatedGuidedVehicle ..> NavigationType
+AutomatedGuidedVehicle ..> ChargingType
+
+enum InspectionState {
+  PLANNED
+  IN_PROGRESS
+  EXECUTED
+  REPORTED
+}
+
+class Inspection {
+  +id: long [1]
+  +date: DateTime [1]
+  +state: InspectionState [1]
+  +summary: String [0..1]
+}
+
+Robot "1" -right- "0..*" Inspection : has >
+
+Inspection .up.> InspectionState
+
+enum ImportanceLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+class Note {
+  +id: long [1]
+  +summary: String [1]
+  +importance: ImportanceLevel [1]
+  +description: String [0..1]
+}
+
+Inspection "1" -right- "0..*" Note : has >
+
+Note .up.> ImportanceLevel
+
+
+class Photo {
+  +id: long [1]
+  +content: byte[] [1]
+}
+
+Note "1" -right- "0..*" Photo : contains >
+
+class User {
+  +id: long [1]
+  +email: String [1]
+}
+
+class Claim {
+  +id: long [1]
+  +type: String [1]
+  +value: String [1]
+}
+
+User "1" -right- "0..*" Claim : has >
+
+Claim -up[hidden]- NavigationType
+
+@enduml
