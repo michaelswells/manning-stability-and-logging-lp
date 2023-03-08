@@ -46,8 +46,6 @@ public class HealthController
     ///     server side and the client should retry at a later time.
     /// </response>
     [HttpGet("")]
-    [ProducesResponseType(typeof(HealthResult), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(HealthResult), StatusCodes.Status503ServiceUnavailable)]
     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(HealthResult), ApplicationJson)]
     [SwaggerResponse(StatusCodes.Status503ServiceUnavailable, null, typeof(HealthResult), ApplicationJson)]
     public async Task<IActionResult> Health(CancellationToken cancellationToken = default)

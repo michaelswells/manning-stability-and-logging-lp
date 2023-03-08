@@ -159,7 +159,7 @@ public class PhotoController : InspectionsController
     ///     exist.
     /// </response>
     [HttpGet]
-    [SwaggerResponse(StatusCodes.Status200OK, null, typeof(string[]), ApplicationOctetStream)]
+    [SwaggerResponse(StatusCodes.Status200OK, null, typeof(string[]), ApplicationJson)]
     [SwaggerResponse(StatusCodes.Status404NotFound, null, typeof(ProblemDetails), ApplicationProblemJson)]
     [InspectionsAuthorize(Policy.EDIT_INSPECTIONS)]
     public async Task<IActionResult> RetrievePhotos(

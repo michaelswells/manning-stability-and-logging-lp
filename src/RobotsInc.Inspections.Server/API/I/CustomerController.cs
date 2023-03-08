@@ -29,7 +29,7 @@ public class CustomerController
     public CustomerController(
         ILogger<CustomerController> logger,
         ICustomerManager customerManager,
-        IMapper<Customer, Inspections.API.I.Customer> customerMapper)
+        ICustomerMapper customerMapper)
         : base(logger)
     {
         CustomerManager = customerManager;
@@ -37,7 +37,7 @@ public class CustomerController
     }
 
     public ICustomerManager CustomerManager { get; }
-    public IMapper<Customer, Inspections.API.I.Customer> CustomerMapper { get; }
+    public ICustomerMapper CustomerMapper { get; }
 
     /// <summary>
     ///     Create a new <see cref="Inspections.API.I.Customer" /> with the given properties.
@@ -53,8 +53,6 @@ public class CustomerController
     /// <response code="400">
     ///     The given <paramref name="customer" /> does not satisfy the validation criteria and cannot be created.
     /// </response>
-    // [ProducesResponseType(typeof(Inspections.API.I.Customer), StatusCodes.Status201Created, ApplicationJson)]
-    // [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest, ApplicationProblemJson)]
     [HttpPost]
     [SwaggerResponse(StatusCodes.Status201Created, null, typeof(Inspections.API.I.Customer), ApplicationJson)]
     [SwaggerResponse(StatusCodes.Status400BadRequest, null, typeof(HttpValidationProblemDetails), ApplicationProblemJson)]

@@ -6,13 +6,15 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
+
 using Hellang.Authentication.JwtBearer.Google;
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,12 +39,7 @@ using RobotsInc.Inspections.Server.Security;
 
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-using ArticulatedRobot = RobotsInc.Inspections.Models.ArticulatedRobot;
-using AutomatedGuidedVehicle = RobotsInc.Inspections.Models.AutomatedGuidedVehicle;
 using Claim = RobotsInc.Inspections.Models.Security.Claim;
-using Customer = RobotsInc.Inspections.Models.Customer;
-using Inspection = RobotsInc.Inspections.Models.Inspection;
-using Note = RobotsInc.Inspections.Models.Note;
 using Robot = RobotsInc.Inspections.Models.Robot;
 using User = RobotsInc.Inspections.Models.Security.User;
 
@@ -105,7 +102,7 @@ public class Program
                     options.ReportApiVersions = true;
                     options.DefaultApiVersion = new ApiVersion(1, 0);
                 })
-            .AddVersionedApiExplorer(
+            .AddApiExplorer(
                 options =>
                 {
                     options.GroupNameFormat = "'v'V";
@@ -181,11 +178,11 @@ public class Program
         services.AddTransient<IMapper<User, API.I.Security.User>, UserMapper>();
         services.AddTransient<IMapper<Claim, API.I.Security.Claim>, ClaimMapper>();
 
-        services.AddTransient<IMapper<Customer, API.I.Customer>, CustomerMapper>();
-        services.AddTransient<IMapper<ArticulatedRobot, API.I.ArticulatedRobot>, ArticulatedRobotMapper>();
-        services.AddTransient<IMapper<AutomatedGuidedVehicle, API.I.AutomatedGuidedVehicle>, AutomatedGuidedVehicleMapper>();
-        services.AddTransient<IMapper<Inspection, API.I.Inspection>, InspectionMapper>();
-        services.AddTransient<IMapper<Note, API.I.Note>, NoteMapper>();
+        services.AddTransient<ICustomerMapper, CustomerMapper>();
+        services.AddTransient<IArticulatedRobotMapper, ArticulatedRobotMapper>();
+        services.AddTransient<IAutomatedGuidedVehicleMapper, AutomatedGuidedVehicleMapper>();
+        services.AddTransient<IInspectionMapper, InspectionMapper>();
+        services.AddTransient<INoteMapper, NoteMapper>();
 
         // repositories
         services.AddTransient<IUserRepository, UserRepository>();
@@ -213,12 +210,10 @@ public class Program
                         options.OAuthClientId(app.Configuration["Authentication:Google:ClientId"]);
                         options.OAuthClientSecret(app.Configuration["Authentication:Google:ClientSecret"]);
 
-                        IApiVersionDescriptionProvider apiVersionDescriptionProvider =
-                            app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
-                        foreach (ApiVersionDescription description in apiVersionDescriptionProvider.ApiVersionDescriptions)
+                        foreach (ApiVersionDescription description in app.DescribeApiVersions())
                         {
                             options.SwaggerEndpoint(
-                                $"../swagger/{description.GroupName}/swagger.json",
+                                $"/swagger/{description.GroupName}/swagger.json",
                                 $"RobotsInc Inspections API {description.GroupName}");
                         }
                     });

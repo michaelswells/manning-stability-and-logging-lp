@@ -8,7 +8,7 @@ using RobotsInc.Inspections.Repositories;
 
 namespace RobotsInc.Inspections.Server.Mappers;
 
-public abstract class RobotMapper<TModel, TDto> : IMapper<TModel, TDto>
+public abstract class RobotMapper<TModel, TDto> : IRobotMapper<TModel, TDto>
     where TModel : Robot, new()
     where TDto : Inspections.API.I.Robot, new()
 {

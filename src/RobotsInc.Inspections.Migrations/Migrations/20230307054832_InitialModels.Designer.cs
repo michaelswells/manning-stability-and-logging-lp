@@ -12,8 +12,8 @@ using RobotsInc.Inspections.Repositories;
 namespace RobotsInc.Inspections.Repositories.Migrations
 {
     [DbContext(typeof(InspectionsDbContext))]
-    [Migration("20220718003131_UserClaims")]
-    partial class UserClaims
+    [Migration("20230307054832_InitialModels")]
+    partial class InitialModels
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -126,7 +126,8 @@ namespace RobotsInc.Inspections.Repositories.Migrations
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<DateTime?>("ManufacturingDate")
                         .IsRequired()
@@ -144,55 +145,6 @@ namespace RobotsInc.Inspections.Repositories.Migrations
                     b.ToTable("Robots");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("Robot");
-                });
-
-            modelBuilder.Entity("RobotsInc.Inspections.Models.Security.Claim", b =>
-                {
-                    b.Property<long?>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long?>("Id"), 1L, 1);
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Claims");
-                });
-
-            modelBuilder.Entity("RobotsInc.Inspections.Models.Security.User", b =>
-                {
-                    b.Property<long?>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long?>("Id"), 1L, 1);
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Email")
-                        .IsUnique();
-
-                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("RobotsInc.Inspections.Models.ArticulatedRobot", b =>
@@ -256,17 +208,6 @@ namespace RobotsInc.Inspections.Repositories.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("RobotsInc.Inspections.Models.Security.Claim", b =>
-                {
-                    b.HasOne("RobotsInc.Inspections.Models.Security.User", "User")
-                        .WithMany("Claims")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("RobotsInc.Inspections.Models.Customer", b =>
                 {
                     b.Navigation("Robots");
@@ -280,11 +221,6 @@ namespace RobotsInc.Inspections.Repositories.Migrations
             modelBuilder.Entity("RobotsInc.Inspections.Models.Robot", b =>
                 {
                     b.Navigation("Inspections");
-                });
-
-            modelBuilder.Entity("RobotsInc.Inspections.Models.Security.User", b =>
-                {
-                    b.Navigation("Claims");
                 });
 #pragma warning restore 612, 618
         }

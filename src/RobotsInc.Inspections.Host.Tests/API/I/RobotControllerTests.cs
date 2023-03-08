@@ -54,7 +54,7 @@ public class RobotControllerTests : ControllerTests
         // create user and claims - as admin user
         IConfiguration configuration = factory.Services.GetRequiredService<IConfiguration>();
         string adminUser = configuration["Authentication:AdminAccount"];
-        string token = GenerateJwt(adminUser, signInfo);
+        string token = GenerateJwt(adminUser, signInfo, configuration);
         client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {token}");
         User employeeUser =
             new()
@@ -74,7 +74,7 @@ public class RobotControllerTests : ControllerTests
         Assert.Equal(HttpStatusCode.Created, claimResponse.StatusCode);
 
         // create customer - as employee user
-        token = GenerateJwt(employeeUser.Email, signInfo);
+        token = GenerateJwt(employeeUser.Email, signInfo, configuration);
         client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {token}");
 
         ArticulatedRobot newArticulatedRobot =
@@ -109,7 +109,7 @@ public class RobotControllerTests : ControllerTests
         // create user and claims - as admin user
         IConfiguration configuration = factory.Services.GetRequiredService<IConfiguration>();
         string adminUser = configuration["Authentication:AdminAccount"];
-        string token = GenerateJwt(adminUser, signInfo);
+        string token = GenerateJwt(adminUser, signInfo, configuration);
         client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {token}");
         User employeeUser =
             new()
@@ -129,7 +129,7 @@ public class RobotControllerTests : ControllerTests
         Assert.Equal(HttpStatusCode.Created, claimResponse.StatusCode);
 
         // create customer - as employee user
-        token = GenerateJwt(employeeUser.Email, signInfo);
+        token = GenerateJwt(employeeUser.Email, signInfo, configuration);
         client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {token}");
 
         ArticulatedRobot newArticulatedRobot =
@@ -176,7 +176,7 @@ public class RobotControllerTests : ControllerTests
         // create user and claims - as admin user
         IConfiguration configuration = factory.Services.GetRequiredService<IConfiguration>();
         string adminUser = configuration["Authentication:AdminAccount"];
-        string token = GenerateJwt(adminUser, signInfo);
+        string token = GenerateJwt(adminUser, signInfo, configuration);
         client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {token}");
         User employeeUser =
             new()
@@ -196,7 +196,7 @@ public class RobotControllerTests : ControllerTests
         Assert.Equal(HttpStatusCode.Created, claimResponse.StatusCode);
 
         // create customer - as employee user
-        token = GenerateJwt(employeeUser.Email, signInfo);
+        token = GenerateJwt(employeeUser.Email, signInfo, configuration);
         client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {token}");
 
         ArticulatedRobot newArticulatedRobot =
@@ -248,7 +248,7 @@ public class RobotControllerTests : ControllerTests
         // create user and claims - as admin user
         IConfiguration configuration = factory.Services.GetRequiredService<IConfiguration>();
         string adminUser = configuration["Authentication:AdminAccount"];
-        string token = GenerateJwt(adminUser, signInfo);
+        string token = GenerateJwt(adminUser, signInfo, configuration);
         client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {token}");
         User employeeUser =
             new()
@@ -268,7 +268,7 @@ public class RobotControllerTests : ControllerTests
         Assert.Equal(HttpStatusCode.Created, claimResponse.StatusCode);
 
         // create customer - as employee user
-        token = GenerateJwt(employeeUser.Email, signInfo);
+        token = GenerateJwt(employeeUser.Email, signInfo, configuration);
         client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {token}");
 
         ArticulatedRobot newArticulatedRobot =
@@ -308,7 +308,7 @@ public class RobotControllerTests : ControllerTests
         // create user and claims - as admin user
         IConfiguration configuration = factory.Services.GetRequiredService<IConfiguration>();
         string adminUser = configuration["Authentication:AdminAccount"];
-        string token = GenerateJwt(adminUser, signInfo);
+        string token = GenerateJwt(adminUser, signInfo, configuration);
         client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {token}");
         User employeeUser =
             new()
@@ -328,7 +328,7 @@ public class RobotControllerTests : ControllerTests
         Assert.Equal(HttpStatusCode.Created, claimResponse.StatusCode);
 
         // create customer - as employee user
-        token = GenerateJwt(employeeUser.Email, signInfo);
+        token = GenerateJwt(employeeUser.Email, signInfo, configuration);
         client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {token}");
 
         AutomatedGuidedVehicle newAutomatedGuidedVehicle =
@@ -364,7 +364,7 @@ public class RobotControllerTests : ControllerTests
         // create user and claims - as admin user
         IConfiguration configuration = factory.Services.GetRequiredService<IConfiguration>();
         string adminUser = configuration["Authentication:AdminAccount"];
-        string token = GenerateJwt(adminUser, signInfo);
+        string token = GenerateJwt(adminUser, signInfo, configuration);
         client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {token}");
         User employeeUser =
             new()
@@ -384,7 +384,7 @@ public class RobotControllerTests : ControllerTests
         Assert.Equal(HttpStatusCode.Created, claimResponse.StatusCode);
 
         // create customer - as employee user
-        token = GenerateJwt(employeeUser.Email, signInfo);
+        token = GenerateJwt(employeeUser.Email, signInfo, configuration);
         client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {token}");
 
         AutomatedGuidedVehicle newAutomatedGuidedVehicle =
@@ -433,7 +433,7 @@ public class RobotControllerTests : ControllerTests
         // create user and claims - as admin user
         IConfiguration configuration = factory.Services.GetRequiredService<IConfiguration>();
         string adminUser = configuration["Authentication:AdminAccount"];
-        string token = GenerateJwt(adminUser, signInfo);
+        string token = GenerateJwt(adminUser, signInfo, configuration);
         client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {token}");
         User employeeUser =
             new()
@@ -453,7 +453,7 @@ public class RobotControllerTests : ControllerTests
         Assert.Equal(HttpStatusCode.Created, claimResponse.StatusCode);
 
         // create customer - as employee user
-        token = GenerateJwt(employeeUser.Email, signInfo);
+        token = GenerateJwt(employeeUser.Email, signInfo, configuration);
         client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {token}");
 
         AutomatedGuidedVehicle newAutomatedGuidedVehicle =
@@ -508,7 +508,7 @@ public class RobotControllerTests : ControllerTests
         // create user and claims - as admin user
         IConfiguration configuration = factory.Services.GetRequiredService<IConfiguration>();
         string adminUser = configuration["Authentication:AdminAccount"];
-        string token = GenerateJwt(adminUser, signInfo);
+        string token = GenerateJwt(adminUser, signInfo, configuration);
         client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {token}");
         User employeeUser =
             new()
@@ -528,7 +528,7 @@ public class RobotControllerTests : ControllerTests
         Assert.Equal(HttpStatusCode.Created, claimResponse.StatusCode);
 
         // create customer - as employee user
-        token = GenerateJwt(employeeUser.Email, signInfo);
+        token = GenerateJwt(employeeUser.Email, signInfo, configuration);
         client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse($"Bearer {token}");
 
         AutomatedGuidedVehicle newAutomatedGuidedVehicle =

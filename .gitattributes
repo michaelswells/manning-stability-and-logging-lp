@@ -1,0 +1,5 @@
+# enforce eol conversions!
+* text=auto
+
+# ignore certain files for archive
+generate-dist.sh export-ignore

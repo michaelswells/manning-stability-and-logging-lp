@@ -33,7 +33,7 @@ namespace RobotsInc.Inspections.Repositories.Migrations
                     ManufacturingDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: true),
                     CustomerId = table.Column<long>(type: "bigint", nullable: false),
-                    Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Discriminator = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     NrOfJoints = table.Column<int>(type: "int", nullable: true),
                     NavigationType = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
                     ChargingType = table.Column<string>(type: "nvarchar(22)", maxLength: 22, nullable: true)

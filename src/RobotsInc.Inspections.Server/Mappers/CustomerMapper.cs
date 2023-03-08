@@ -8,7 +8,7 @@ using RobotsInc.Inspections.Repositories;
 
 namespace RobotsInc.Inspections.Server.Mappers;
 
-public class CustomerMapper : IMapper<Customer, Inspections.API.I.Customer>
+public class CustomerMapper : ICustomerMapper
 {
     private readonly ICustomerRepository _customerRepository;
 

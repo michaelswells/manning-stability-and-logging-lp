@@ -1,0 +1,15 @@
+# ignore user config files
+*.user
+
+# ignore build artifacts
+/src/*/[Bb]in
+/src/*/[Oo]bj
+
+# ignore Resharper cache files
+/_ReSharper*
+
+# ignore Rider settings
+/.idea
+
+# dist folder
+/dist

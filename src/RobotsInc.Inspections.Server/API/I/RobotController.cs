@@ -35,8 +35,8 @@ public class RobotController
         IRobotManager<Robot> robotManager,
         IArticulatedRobotManager articulatedRobotManager,
         IAutomatedGuidedVehicleManager automatedGuidedVehicleManager,
-        IMapper<ArticulatedRobot, Inspections.API.I.ArticulatedRobot> articulatedRobotMapper,
-        IMapper<AutomatedGuidedVehicle, Inspections.API.I.AutomatedGuidedVehicle> automatedGuidedVehicleMapper)
+        IArticulatedRobotMapper articulatedRobotMapper,
+        IAutomatedGuidedVehicleMapper automatedGuidedVehicleMapper)
         : base(logger)
     {
         CustomerManager = customerManager;
@@ -51,8 +51,8 @@ public class RobotController
     public IRobotManager<Robot> RobotManager { get; }
     public IArticulatedRobotManager ArticulatedRobotManager { get; }
     public IAutomatedGuidedVehicleManager AutomatedGuidedVehicleManager { get; }
-    public IMapper<ArticulatedRobot, Inspections.API.I.ArticulatedRobot> ArticulatedRobotMapper { get; }
-    public IMapper<AutomatedGuidedVehicle, Inspections.API.I.AutomatedGuidedVehicle> AutomatedGuidedVehicleMapper { get; }
+    public IArticulatedRobotMapper ArticulatedRobotMapper { get; }
+    public IAutomatedGuidedVehicleMapper AutomatedGuidedVehicleMapper { get; }
 
     /// <summary>
     ///     Create a new <see cref="Inspections.API.I.Robot" /> with the given properties.

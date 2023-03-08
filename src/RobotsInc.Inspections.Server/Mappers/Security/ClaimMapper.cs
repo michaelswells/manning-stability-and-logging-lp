@@ -8,7 +8,7 @@ using RobotsInc.Inspections.Repositories.Security;
 
 namespace RobotsInc.Inspections.Server.Mappers.Security;
 
-public class ClaimMapper : IMapper<Claim, Inspections.API.I.Security.Claim>
+public class ClaimMapper : IClaimMapper
 {
     private readonly IClaimRepository _claimRepository;
 

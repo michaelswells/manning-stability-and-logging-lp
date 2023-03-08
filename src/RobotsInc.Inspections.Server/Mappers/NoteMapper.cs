@@ -8,7 +8,7 @@ using RobotsInc.Inspections.Repositories;
 
 namespace RobotsInc.Inspections.Server.Mappers;
 
-public class NoteMapper : IMapper<Note, Inspections.API.I.Note>
+public class NoteMapper : INoteMapper
 {
     private readonly INoteRepository _noteRepository;
 

@@ -15,6 +15,7 @@ using Hellang.Authentication.JwtBearer.Google;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -106,7 +107,7 @@ public class ControllerTests
         .WithWebHostBuilder(
             builder =>
             {
-                builder.ConfigureServices(
+                builder.ConfigureTestServices(
                     services =>
                     {
                         foreach (Action<IServiceCollection> action in actions)
@@ -148,12 +149,13 @@ public class ControllerTests
         return (SignKey: signKey, ValidateKey: validateKey, SignatureAlgorithm: signatureAlgorithm);
     }
 
-    public string GenerateJwt(string username, (SecurityKey SignKey, SecurityKey ValidateKey, string SignatureAlgorithm) signInfo)
+    public string GenerateJwt(string username, (SecurityKey SignKey, SecurityKey ValidateKey, string SignatureAlgorithm) signInfo, IConfiguration configuration)
     {
+        string clientId = configuration["Authentication:Google:ClientId"];
         SecurityTokenDescriptor tokenDescriptor =
             new()
             {
-                Audience = "1066237122225-i91optkogqnrd9c5fkaslubvf7snck5a.apps.googleusercontent.com",
+                Audience = clientId,
                 Issuer = "https://accounts.google.com",
                 Subject = new ClaimsIdentity(new[] { new Claim("sub", username) }),
                 IssuedAt = DateTime.UtcNow,
@@ -162,7 +164,7 @@ public class ControllerTests
                 Claims =
                     new Dictionary<string, object>()
                     {
-                        { "azp", "1066237122225-i91optkogqnrd9c5fkaslubvf7snck5a.apps.googleusercontent.com" },
+                        { "azp", clientId },
                         { "email", username },
                         { "email_verified", "true" },
                         { "at_hash", "DoesNotMatter" },

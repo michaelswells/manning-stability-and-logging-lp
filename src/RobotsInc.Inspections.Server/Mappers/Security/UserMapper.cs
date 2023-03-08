@@ -8,7 +8,7 @@ using RobotsInc.Inspections.Repositories.Security;
 
 namespace RobotsInc.Inspections.Server.Mappers.Security;
 
-public class UserMapper : IMapper<User, Inspections.API.I.Security.User>
+public class UserMapper : IUserMapper
 {
     private readonly IUserRepository _userRepository;
 

@@ -6,7 +6,9 @@ using RobotsInc.Inspections.Repositories;
 
 namespace RobotsInc.Inspections.Server.Mappers;
 
-public class AutomatedGuidedVehicleMapper : RobotMapper<AutomatedGuidedVehicle, Inspections.API.I.AutomatedGuidedVehicle>
+public class AutomatedGuidedVehicleMapper
+    : RobotMapper<AutomatedGuidedVehicle, Inspections.API.I.AutomatedGuidedVehicle>,
+      IAutomatedGuidedVehicleMapper
 {
     public AutomatedGuidedVehicleMapper(IAutomatedGuidedVehicleRepository robotRepository)
         : base(robotRepository)

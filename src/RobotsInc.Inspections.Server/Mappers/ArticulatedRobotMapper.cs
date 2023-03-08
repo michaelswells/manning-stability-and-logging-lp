@@ -6,7 +6,9 @@ using RobotsInc.Inspections.Repositories;
 
 namespace RobotsInc.Inspections.Server.Mappers;
 
-public class ArticulatedRobotMapper : RobotMapper<ArticulatedRobot, Inspections.API.I.ArticulatedRobot>
+public class ArticulatedRobotMapper
+    : RobotMapper<ArticulatedRobot, Inspections.API.I.ArticulatedRobot>,
+      IArticulatedRobotMapper
 {
     public ArticulatedRobotMapper(IArticulatedRobotRepository robotRepository)
         : base(robotRepository)

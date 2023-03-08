@@ -12,8 +12,8 @@ using RobotsInc.Inspections.Repositories;
 namespace RobotsInc.Inspections.Repositories.Migrations
 {
     [DbContext(typeof(InspectionsDbContext))]
-    [Migration("20220906200004_Photos")]
-    partial class Photos
+    [Migration("20230307060635_UserClaims")]
+    partial class UserClaims
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -109,28 +109,6 @@ namespace RobotsInc.Inspections.Repositories.Migrations
                     b.ToTable("Notes");
                 });
 
-            modelBuilder.Entity("RobotsInc.Inspections.Models.Photo", b =>
-                {
-                    b.Property<long?>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long?>("Id"), 1L, 1);
-
-                    b.Property<byte[]>("Content")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<long>("NoteId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NoteId");
-
-                    b.ToTable("Photos");
-                });
-
             modelBuilder.Entity("RobotsInc.Inspections.Models.Robot", b =>
                 {
                     b.Property<long?>("Id")
@@ -148,7 +126,8 @@ namespace RobotsInc.Inspections.Repositories.Migrations
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<DateTime?>("ManufacturingDate")
                         .IsRequired()
@@ -267,17 +246,6 @@ namespace RobotsInc.Inspections.Repositories.Migrations
                     b.Navigation("Inspection");
                 });
 
-            modelBuilder.Entity("RobotsInc.Inspections.Models.Photo", b =>
-                {
-                    b.HasOne("RobotsInc.Inspections.Models.Note", "Note")
-                        .WithMany("Photos")
-                        .HasForeignKey("NoteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Note");
-                });
-
             modelBuilder.Entity("RobotsInc.Inspections.Models.Robot", b =>
                 {
                     b.HasOne("RobotsInc.Inspections.Models.Customer", "Customer")
@@ -308,11 +276,6 @@ namespace RobotsInc.Inspections.Repositories.Migrations
             modelBuilder.Entity("RobotsInc.Inspections.Models.Inspection", b =>
                 {
                     b.Navigation("Notes");
-                });
-
-            modelBuilder.Entity("RobotsInc.Inspections.Models.Note", b =>
-                {
-                    b.Navigation("Photos");
                 });
 
             modelBuilder.Entity("RobotsInc.Inspections.Models.Robot", b =>

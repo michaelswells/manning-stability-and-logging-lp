@@ -12,8 +12,8 @@ using RobotsInc.Inspections.Repositories;
 namespace RobotsInc.Inspections.Repositories.Migrations
 {
     [DbContext(typeof(InspectionsDbContext))]
-    [Migration("20220523024552_InitialModels")]
-    partial class InitialModels
+    [Migration("20230307093139_Photos")]
+    partial class Photos
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -109,6 +109,28 @@ namespace RobotsInc.Inspections.Repositories.Migrations
                     b.ToTable("Notes");
                 });
 
+            modelBuilder.Entity("RobotsInc.Inspections.Models.Photo", b =>
+                {
+                    b.Property<long?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long?>("Id"), 1L, 1);
+
+                    b.Property<byte[]>("Content")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<long>("NoteId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NoteId");
+
+                    b.ToTable("Photos");
+                });
+
             modelBuilder.Entity("RobotsInc.Inspections.Models.Robot", b =>
                 {
                     b.Property<long?>("Id")
@@ -126,7 +148,8 @@ namespace RobotsInc.Inspections.Repositories.Migrations
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<DateTime?>("ManufacturingDate")
                         .IsRequired()
@@ -144,6 +167,55 @@ namespace RobotsInc.Inspections.Repositories.Migrations
                     b.ToTable("Robots");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("Robot");
+                });
+
+            modelBuilder.Entity("RobotsInc.Inspections.Models.Security.Claim", b =>
+                {
+                    b.Property<long?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long?>("Id"), 1L, 1);
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Claims");
+                });
+
+            modelBuilder.Entity("RobotsInc.Inspections.Models.Security.User", b =>
+                {
+                    b.Property<long?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long?>("Id"), 1L, 1);
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("RobotsInc.Inspections.Models.ArticulatedRobot", b =>
@@ -196,6 +268,17 @@ namespace RobotsInc.Inspections.Repositories.Migrations
                     b.Navigation("Inspection");
                 });
 
+            modelBuilder.Entity("RobotsInc.Inspections.Models.Photo", b =>
+                {
+                    b.HasOne("RobotsInc.Inspections.Models.Note", "Note")
+                        .WithMany("Photos")
+                        .HasForeignKey("NoteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Note");
+                });
+
             modelBuilder.Entity("RobotsInc.Inspections.Models.Robot", b =>
                 {
                     b.HasOne("RobotsInc.Inspections.Models.Customer", "Customer")
@@ -205,6 +288,17 @@ namespace RobotsInc.Inspections.Repositories.Migrations
                         .IsRequired();
 
                     b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("RobotsInc.Inspections.Models.Security.Claim", b =>
+                {
+                    b.HasOne("RobotsInc.Inspections.Models.Security.User", "User")
+                        .WithMany("Claims")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("RobotsInc.Inspections.Models.Customer", b =>
@@ -217,9 +311,19 @@ namespace RobotsInc.Inspections.Repositories.Migrations
                     b.Navigation("Notes");
                 });
 
+            modelBuilder.Entity("RobotsInc.Inspections.Models.Note", b =>
+                {
+                    b.Navigation("Photos");
+                });
+
             modelBuilder.Entity("RobotsInc.Inspections.Models.Robot", b =>
                 {
                     b.Navigation("Inspections");
+                });
+
+            modelBuilder.Entity("RobotsInc.Inspections.Models.Security.User", b =>
+                {
+                    b.Navigation("Claims");
                 });
 #pragma warning restore 612, 618
         }
