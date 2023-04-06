@@ -38,6 +38,7 @@ using RobotsInc.Inspections.Server.Mappers.Security;
 using RobotsInc.Inspections.Server.Security;
 
 using Serilog;
+using Serilog.Formatting.Compact;
 
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -53,14 +54,21 @@ public class Program
     {
         Log.Logger = new LoggerConfiguration()
             .WriteTo.Console()
-            .CreateLogger();
+            .CreateBootstrapLogger();
 
         try
         {
             Log.Information($"Starting {typeof(Program).Namespace} application");
 
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-            builder.Host.UseSerilog();
+            builder.Host.UseSerilog(
+                (context, services, configuration) =>
+                configuration
+                .ReadFrom.Configuration(context.Configuration)
+                .ReadFrom.Services(services)
+                .Enrich.FromLogContext()
+                .WriteTo.Console(new RenderedCompactJsonFormatter()),
+                writeToProviders: true);
 
             Configure(builder.Services, builder.Configuration);
             WebApplication app = builder.Build();
@@ -237,6 +245,8 @@ public class Program
                         }
                     });
         }
+
+        app.UseSerilogRequestLogging();
 
         app.UseRouting();
 
