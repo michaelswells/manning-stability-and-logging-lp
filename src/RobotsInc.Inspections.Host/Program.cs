@@ -37,6 +37,8 @@ using RobotsInc.Inspections.Server.Mappers;
 using RobotsInc.Inspections.Server.Mappers.Security;
 using RobotsInc.Inspections.Server.Security;
 
+using Serilog;
+
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 using Claim = RobotsInc.Inspections.Models.Security.Claim;
@@ -49,13 +51,30 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        Console.WriteLine($"Running {typeof(Program).Namespace}");
+        Log.Logger = new LoggerConfiguration()
+            .WriteTo.Console()
+            .CreateLogger();
 
-        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-        Configure(builder.Services, builder.Configuration);
-        WebApplication app = builder.Build();
-        Configure(app);
-        app.Run();
+        try
+        {
+            Log.Information($"Starting {typeof(Program).Namespace} application");
+
+            WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+            builder.Host.UseSerilog();
+
+            Configure(builder.Services, builder.Configuration);
+            WebApplication app = builder.Build();
+            Configure(app);
+            app.Run();
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "Application terminated unexpectedly");
+        }
+        finally
+        {
+            Log.CloseAndFlush();
+        }
     }
 
     private static void Configure(IServiceCollection services, IConfiguration configuration)
