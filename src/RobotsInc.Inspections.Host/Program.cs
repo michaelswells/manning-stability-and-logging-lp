@@ -115,6 +115,16 @@ public class Program
 
         // asp.net core
         services
+            .AddCors(setupAction:
+                corsOptions =>
+                {
+                    corsOptions.AddPolicy(
+                        "UI",
+                        policy => policy.WithOrigins("http://localhost:8080")
+                                        .AllowAnyMethod()
+                                        .AllowAnyHeader()
+                                        .AllowCredentials());
+                })
             .AddControllers()
             .AddApplicationPart(typeof(HealthController).Assembly)
             .AddJsonOptions(
@@ -258,6 +268,7 @@ public class Program
         app.UseSerilogRequestLogging();
 
         app.UseRouting();
+        app.UseCors();
 
         app.UseAuthentication();
         app.UseAuthorization();

@@ -57,7 +57,8 @@ public class HealthController
             health.Status == HealthStatus.HEALTHY
                 ? Ok(health)
                 : StatusCode(StatusCodes.Status503ServiceUnavailable, health);
-        var a = new { StatusCode = result.StatusCode, Health = health };
+
+        var a = new { statusCode = result.StatusCode, health = health };
         Logger.LogDebug("Health was {@result}", a);
 
         return result;

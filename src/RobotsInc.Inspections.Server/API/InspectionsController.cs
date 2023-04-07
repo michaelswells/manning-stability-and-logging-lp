@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -7,6 +8,7 @@ namespace RobotsInc.Inspections.Server.API;
 
 [ApiController]
 [InspectionsAuthorize]
+[EnableCors("UI")]
 public abstract class InspectionsController : ControllerBase
 {
     protected const string ApplicationJson = "application/json";
