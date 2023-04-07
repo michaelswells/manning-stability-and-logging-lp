@@ -38,7 +38,6 @@ using RobotsInc.Inspections.Server.Mappers.Security;
 using RobotsInc.Inspections.Server.Security;
 
 using Serilog;
-using Serilog.Formatting.Compact;
 
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -67,7 +66,7 @@ public class Program
                 .ReadFrom.Configuration(context.Configuration)
                 .ReadFrom.Services(services)
                 .Enrich.FromLogContext()
-                .WriteTo.Console(new RenderedCompactJsonFormatter()),
+                .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}"),
                 writeToProviders: true);
 
             Configure(builder.Services, builder.Configuration);
