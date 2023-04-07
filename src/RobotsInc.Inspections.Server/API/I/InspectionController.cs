@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 
 using RobotsInc.Inspections.BusinessLogic;
 using RobotsInc.Inspections.Models;
+using RobotsInc.Inspections.Server.Filters;
 using RobotsInc.Inspections.Server.Mappers;
 using RobotsInc.Inspections.Server.Security;
 
@@ -91,13 +92,7 @@ public class InspectionController
 
         if (inspection.Id != null)
         {
-            ProblemDetails problemDetails =
-                new HttpValidationProblemDetails(
-                    new Dictionary<string, string[]>
-                    {
-                        { "Id", new[] { "must not be given" } }
-                    });
-            return BadRequest(problemDetails);
+            throw new InvalidPropertyException("Id", "must not be given");
         }
 
         Inspection model = await InspectionMapper.MapAsync(inspection, cancellationToken);
@@ -282,13 +277,7 @@ public class InspectionController
 
         if ((inspection.Id != null) && (inspection.Id != model.Id))
         {
-            ProblemDetails problemDetails =
-                new HttpValidationProblemDetails(
-                    new Dictionary<string, string[]>
-                    {
-                        { "Id", new[] { "must not be given" } }
-                    });
-            return BadRequest(problemDetails);
+            throw new InvalidPropertyException("Id", "must not be given");
         }
 
         await InspectionMapper.MapAsync(inspection, model, cancellationToken);

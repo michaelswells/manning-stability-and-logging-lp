@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 
 using RobotsInc.Inspections.BusinessLogic;
 using RobotsInc.Inspections.Models;
+using RobotsInc.Inspections.Server.Filters;
 using RobotsInc.Inspections.Server.Mappers;
 using RobotsInc.Inspections.Server.Security;
 
@@ -99,13 +100,7 @@ public class NoteController
 
         if (note.Id != null)
         {
-            ProblemDetails problemDetails =
-                new HttpValidationProblemDetails(
-                    new Dictionary<string, string[]>
-                    {
-                        { "Id", new[] { "must not be given" } }
-                    });
-            return BadRequest(problemDetails);
+            throw new InvalidPropertyException("Id", "must not be given");
         }
 
         Note model = await NoteMapper.MapAsync(note, cancellationToken);
@@ -293,13 +288,7 @@ public class NoteController
 
         if ((note.Id != null) && (note.Id != model.Id))
         {
-            ProblemDetails problemDetails =
-                new HttpValidationProblemDetails(
-                    new Dictionary<string, string[]>
-                    {
-                        { "Id", new[] { "must not be given" } }
-                    });
-            return BadRequest(problemDetails);
+            throw new InvalidPropertyException("Id", "must not be given");
         }
 
         await NoteMapper.MapAsync(note, model, cancellationToken);

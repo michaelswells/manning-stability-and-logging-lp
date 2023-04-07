@@ -34,6 +34,7 @@ using RobotsInc.Inspections.BusinessLogic.Util;
 using RobotsInc.Inspections.Repositories;
 using RobotsInc.Inspections.Repositories.Security;
 using RobotsInc.Inspections.Server.API.I;
+using RobotsInc.Inspections.Server.Filters;
 using RobotsInc.Inspections.Server.Mappers;
 using RobotsInc.Inspections.Server.Mappers.Security;
 using RobotsInc.Inspections.Server.Middleware;
@@ -126,7 +127,11 @@ public class Program
                                         .AllowAnyHeader()
                                         .AllowCredentials());
                 })
-            .AddControllers()
+            .AddControllers(
+                options =>
+                {
+                    options.Filters.Add<InvalidPropertyExceptionFilter>();
+                })
             .AddApplicationPart(typeof(HealthController).Assembly)
             .AddJsonOptions(
                 options =>

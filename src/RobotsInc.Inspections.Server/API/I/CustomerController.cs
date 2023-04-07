@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -7,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 using RobotsInc.Inspections.BusinessLogic;
+using RobotsInc.Inspections.Server.Filters;
 using RobotsInc.Inspections.Server.Mappers;
 using RobotsInc.Inspections.Server.Security;
 
@@ -62,13 +62,7 @@ public class CustomerController
     {
         if (customer.Id != null)
         {
-            ProblemDetails problemDetails =
-                new HttpValidationProblemDetails(
-                    new Dictionary<string, string[]>
-                    {
-                        { "Id", new[] { "must not be given" } }
-                    });
-            return BadRequest(problemDetails);
+            throw new InvalidPropertyException("Id", "must not be given");
         }
 
         Customer model = await CustomerMapper.MapAsync(customer, cancellationToken);
@@ -148,13 +142,7 @@ public class CustomerController
 
         if ((customer.Id != null) && (customer.Id != model.Id))
         {
-            ProblemDetails problemDetails =
-                new HttpValidationProblemDetails(
-                    new Dictionary<string, string[]>
-                    {
-                        { "Id", new[] { "must not be given" } }
-                    });
-            return BadRequest(problemDetails);
+            throw new InvalidPropertyException("Id", "must not be given");
         }
 
         await CustomerMapper.MapAsync(customer, model, cancellationToken);

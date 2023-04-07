@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,6 +7,7 @@ using Microsoft.Extensions.Logging;
 
 using RobotsInc.Inspections.BusinessLogic.Security;
 using RobotsInc.Inspections.Models.Security;
+using RobotsInc.Inspections.Server.Filters;
 using RobotsInc.Inspections.Server.Mappers;
 using RobotsInc.Inspections.Server.Security;
 
@@ -83,13 +83,7 @@ public class ClaimController : InspectionsController
 
         if (claim.Id != null)
         {
-            ProblemDetails problemDetails =
-                new HttpValidationProblemDetails(
-                    new Dictionary<string, string[]>
-                    {
-                        { "Id", new[] { "must not be given" } }
-                    });
-            return BadRequest(problemDetails);
+            throw new InvalidPropertyException("Id", "must not be given");
         }
 
         Claim model = await ClaimMapper.MapAsync(claim, cancellationToken);
@@ -193,13 +187,7 @@ public class ClaimController : InspectionsController
 
         if ((claim.Id != null) && (claim.Id != model.Id))
         {
-            ProblemDetails problemDetails =
-                new HttpValidationProblemDetails(
-                    new Dictionary<string, string[]>
-                    {
-                        { "Id", new[] { "must not be given" } }
-                    });
-            return BadRequest(problemDetails);
+            throw new InvalidPropertyException("Id", "must not be given");
         }
 
         await ClaimMapper.MapAsync(claim, model, cancellationToken);

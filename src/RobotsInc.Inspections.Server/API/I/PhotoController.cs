@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -12,6 +11,7 @@ using Microsoft.Extensions.Logging;
 
 using RobotsInc.Inspections.BusinessLogic;
 using RobotsInc.Inspections.Models;
+using RobotsInc.Inspections.Server.Filters;
 using RobotsInc.Inspections.Server.Security;
 
 using Swashbuckle.AspNetCore.Annotations;
@@ -103,13 +103,7 @@ public class PhotoController : InspectionsController
         if (!string.IsNullOrWhiteSpace(file.FileName)
             && !file.FileName.EndsWith(".jpg", StringComparison.InvariantCultureIgnoreCase))
         {
-            ProblemDetails problemDetails =
-                new HttpValidationProblemDetails(
-                    new Dictionary<string, string[]>
-                    {
-                        { "FileName", new[] { "must end with 'jpg'" } }
-                    });
-            return BadRequest(problemDetails);
+            throw new InvalidPropertyException("Id", "must not be given");
         }
 
         byte[] content = new byte[file.Length];
