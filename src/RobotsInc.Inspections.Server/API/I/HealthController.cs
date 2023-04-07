@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 
 using RobotsInc.Inspections.API.I.Health;
 using RobotsInc.Inspections.BusinessLogic.Health;
+using RobotsInc.Inspections.Server.Middleware;
 
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -19,6 +20,7 @@ namespace RobotsInc.Inspections.Server.API.I;
     Inspections.API.I.Routes.ApiVersion
     + Inspections.API.I.Routes.Health)]
 [AllowAnonymous]
+[NoTransaction]
 public class HealthController
     : InspectionsController
 {
@@ -48,6 +50,7 @@ public class HealthController
     [HttpGet("")]
     [SwaggerResponse(StatusCodes.Status200OK, null, typeof(HealthResult), ApplicationJson)]
     [SwaggerResponse(StatusCodes.Status503ServiceUnavailable, null, typeof(HealthResult), ApplicationJson)]
+    [NoTransaction]
     public async Task<IActionResult> Health(CancellationToken cancellationToken = default)
     {
         Logger.LogDebug("Requested health check.");
