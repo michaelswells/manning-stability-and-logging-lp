@@ -52,11 +52,14 @@ public class HealthController
     {
         Logger.LogDebug("Requested health check.");
         HealthResult health = await HealthManager.CheckHealthAsync(cancellationToken);
-        Logger.LogDebug("Health was {0}", health.Status);
 
-        return
+        var result =
             health.Status == HealthStatus.HEALTHY
                 ? Ok(health)
                 : StatusCode(StatusCodes.Status503ServiceUnavailable, health);
+        var a = new { StatusCode = result.StatusCode, Health = health };
+        Logger.LogDebug("Health was {@result}", a);
+
+        return result;
     }
 }
