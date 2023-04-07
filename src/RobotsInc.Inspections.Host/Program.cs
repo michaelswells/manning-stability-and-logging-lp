@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -57,6 +58,8 @@ public class Program
 
         try
         {
+            string assemblyLocation = Assembly.GetExecutingAssembly().Location;
+
             Log.Information($"Starting {typeof(Program).Namespace} application");
 
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -66,7 +69,8 @@ public class Program
                 .ReadFrom.Configuration(context.Configuration)
                 .ReadFrom.Services(services)
                 .Enrich.FromLogContext()
-                .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}"),
+                .Enrich.WithProperty("Version", FileVersionInfo.GetVersionInfo(assemblyLocation).ProductVersion)
+                .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] [{Version}] [{SourceContext}] {Message:lj}{NewLine}{Exception}"),
                 writeToProviders: true);
 
             Configure(builder.Services, builder.Configuration);
