@@ -54,7 +54,10 @@ public class Program
     {
         Log.Logger = new LoggerConfiguration()
             .WriteTo.Console()
+            .WriteTo.Seq("http://localhost:5341/")
             .CreateBootstrapLogger();
+
+        // Serilog.Debugging.SelfLog.Enable(Console.Error);
 
         try
         {
@@ -64,14 +67,17 @@ public class Program
 
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
             builder.Host.UseSerilog(
-                (context, services, configuration) =>
+                configureLogger: (context, services, configuration) =>
                 configuration
-                .ReadFrom.Configuration(context.Configuration)
-                .ReadFrom.Services(services)
+                .ReadFrom.Configuration(configuration: context.Configuration)
+                .ReadFrom.Services(services: services)
                 .Enrich.FromLogContext()
-                .Enrich.WithProperty("Version", FileVersionInfo.GetVersionInfo(assemblyLocation).ProductVersion)
-                .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] [{Version}] [{SourceContext}] {Message:lj}{NewLine}{Exception}"),
+                .Enrich.WithProperty(name: "Version", value: FileVersionInfo.GetVersionInfo(assemblyLocation).ProductVersion!)
+                .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] [{Version}] [{SourceContext}] {Message:lj}{NewLine}{Exception}")
+                .WriteTo.Seq("http://localhost:5341/"),
                 writeToProviders: true);
+
+            // Serilog.Debugging.SelfLog.Enable(Console.Error);
 
             Configure(builder.Services, builder.Configuration);
             WebApplication app = builder.Build();
