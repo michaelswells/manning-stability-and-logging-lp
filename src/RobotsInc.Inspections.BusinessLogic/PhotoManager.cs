@@ -1,8 +1,5 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
-
-using Microsoft.EntityFrameworkCore.Storage;
 
 using RobotsInc.Inspections.Models;
 using RobotsInc.Inspections.Repositories;
@@ -40,7 +37,9 @@ public class PhotoManager
     public async Task<long[]> FindIdsByNoteIdAsync(long noteId, CancellationToken cancellationToken)
     {
         long[] photoIds;
-        IDbContextTransaction transaction = await InspectionsDbContext.Database.BeginTransactionAsync(cancellationToken);
+        photoIds = await PhotoRepository.FindIdsByNoteIdAsync(noteId, cancellationToken);
+
+        /*IDbContextTransaction transaction = await InspectionsDbContext.Database.BeginTransactionAsync(cancellationToken);
         try
         {
             photoIds = await PhotoRepository.FindIdsByNoteIdAsync(noteId, cancellationToken);
@@ -50,7 +49,7 @@ public class PhotoManager
         {
             await transaction.RollbackAsync(cancellationToken);
             throw;
-        }
+        }*/
 
         return photoIds;
     }

@@ -1,8 +1,5 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
-
-using Microsoft.EntityFrameworkCore.Storage;
 
 using RobotsInc.Inspections.API.I;
 using RobotsInc.Inspections.Repositories;
@@ -38,7 +35,10 @@ public class RobotManager<TRobot>
     /// <inheritdoc />
     public async Task<PagedList<TRobot>> FindByCriteriaAsync(RobotSearchCriteria criteria, CancellationToken cancellationToken)
     {
-        IDbContextTransaction transaction = await InspectionsDbContext.Database.BeginTransactionAsync(cancellationToken);
+        PagedList<TRobot> robots = await RobotRepository.FindByCriteriaAsync(criteria, cancellationToken);
+        return robots;
+
+        /*IDbContextTransaction transaction = await InspectionsDbContext.Database.BeginTransactionAsync(cancellationToken);
         try
         {
             PagedList<TRobot> robots = await RobotRepository.FindByCriteriaAsync(criteria, cancellationToken);
@@ -49,6 +49,6 @@ public class RobotManager<TRobot>
         {
             await transaction.RollbackAsync(cancellationToken);
             throw;
-        }
+        }*/
     }
 }

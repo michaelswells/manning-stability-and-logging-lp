@@ -1,9 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-
-using Microsoft.EntityFrameworkCore.Storage;
 
 using RobotsInc.Inspections.Models.Security;
 using RobotsInc.Inspections.Repositories;
@@ -38,7 +35,10 @@ public class ClaimManager
     /// <inheritdoc />
     public async Task<IList<Claim>> FindByUserEmailAsync(string email, CancellationToken cancellationToken)
     {
-        IDbContextTransaction transaction = await InspectionsDbContext.Database.BeginTransactionAsync(cancellationToken);
+        IList<Claim> claims = await ClaimRepository.FindByUserEmailAsync(email, cancellationToken);
+        return claims;
+
+        /*IDbContextTransaction transaction = await InspectionsDbContext.Database.BeginTransactionAsync(cancellationToken);
         try
         {
             IList<Claim> claims = await ClaimRepository.FindByUserEmailAsync(email, cancellationToken);
@@ -49,6 +49,6 @@ public class ClaimManager
         {
             await transaction.RollbackAsync(cancellationToken);
             throw;
-        }
+        }*/
     }
 }

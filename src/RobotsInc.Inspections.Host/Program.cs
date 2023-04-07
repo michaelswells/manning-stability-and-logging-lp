@@ -36,6 +36,7 @@ using RobotsInc.Inspections.Repositories.Security;
 using RobotsInc.Inspections.Server.API.I;
 using RobotsInc.Inspections.Server.Mappers;
 using RobotsInc.Inspections.Server.Mappers.Security;
+using RobotsInc.Inspections.Server.Middleware;
 using RobotsInc.Inspections.Server.Security;
 
 using Serilog;
@@ -201,7 +202,8 @@ public class Program
                 })
             .AddTransient<IClaimsTransformation, InspectionsClaimsTransformation>()
             .AddSingleton<IAuthorizationHandler, EmployeeConsultHandler>()
-            .AddSingleton<IAuthorizationHandler, CustomerConsultHandler>();
+            .AddSingleton<IAuthorizationHandler, CustomerConsultHandler>()
+            .AddScoped<DataBaseTransactionMiddleware>();
 
         // own registrations
         // managers
@@ -270,6 +272,7 @@ public class Program
         app.UseRouting();
         app.UseCors();
 
+        app.UseMiddleware<DataBaseTransactionMiddleware>();
         app.UseAuthentication();
         app.UseAuthorization();
 
